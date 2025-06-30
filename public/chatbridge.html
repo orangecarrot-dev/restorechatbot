@@ -11,14 +11,14 @@
         README:
         1. Change the WEBHOOK_URL constant below to your n8n webhook endpoint
         2. In n8n, create a workflow with:
-           - Webhook trigger (GET method)
+           - Webhook trigger (POST method)
            - Your processing logic
-           - Respond to Webhook node with JSON format: { "reply": "Your response here" }
-        3. The webhook should accept a 'text' query parameter with the user's message
+           - Respond to Webhook node with JSON format: { "message": "Your response here" }
+        3. The webhook should accept a JSON body with 'text' property containing the user's message
         
         Example n8n setup:
-        - Webhook Trigger → [Your Logic] → Respond to Webhook
-        - Respond with: { "reply": "{{ $json.processedResponse }}" }
+        - Webhook Trigger (POST) → [Your Logic] → Respond to Webhook
+        - Respond with: { "message": "{{ $json.processedResponse }}" }
         */
         
         * {
@@ -283,24 +283,24 @@
             const typingBubble = addMessageBubble('Thinking...', 'typing');
             
             try {
-                // Build GET request URL with query parameter
-                const requestUrl = `${WEBHOOK_URL}?text=${encodeURIComponent(message)}`;
-                
-                console.log('Sending request to:', requestUrl);
+                console.log('Sending POST request to:', WEBHOOK_URL);
+                console.log('Request body:', { text: message });
                 
                 // Create timeout promise
                 const timeoutPromise = new Promise((_, reject) =>
                     setTimeout(() => reject(new Error('Request timeout')), 15000)
                 );
                 
-                // Make the request with timeout
+                // Make the POST request with timeout
                 const response = await Promise.race([
-                    fetch(requestUrl, {
-                        method: 'GET',
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
                         mode: 'cors',
                         headers: {
+                            'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                        }
+                        },
+                        body: JSON.stringify({ text: message })
                     }),
                     timeoutPromise
                 ]);
@@ -315,8 +315,8 @@
                 // Remove typing indicator
                 typingBubble.remove();
                 
-                // Add assistant response
-                const reply = data.reply || 'No response received';
+                // Add assistant response - extract 'message' field
+                const reply = data.message || 'No message received';
                 addMessageBubble(reply, 'assistant');
                 
             } catch (error) {
@@ -331,6 +331,8 @@
                     errorMessage = 'Request timed out. Please try again.';
                 } else if (error.message.includes('Failed to fetch')) {
                     errorMessage = 'Unable to connect. Please check your webhook URL.';
+                } else if (error.message.includes('HTTP')) {
+                    errorMessage = `Server error: ${error.message}`;
                 }
                 
                 addMessageBubble(errorMessage, 'error');
