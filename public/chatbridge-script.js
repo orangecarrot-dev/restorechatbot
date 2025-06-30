@@ -108,14 +108,21 @@ async function sendMessage() {
     }
 }
 
-// Add message bubble to chat
+// Add message bubble to chat with proper line break handling
 function addMessageBubble(text, type) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = `bubble ${type}`;
-    bubbleDiv.textContent = text;
+    
+    // Convert line breaks to HTML breaks for proper formatting
+    if (type === 'assistant' || type === 'user') {
+        const formattedText = text.replace(/\n/g, '<br>');
+        bubbleDiv.innerHTML = formattedText;
+    } else {
+        bubbleDiv.textContent = text;
+    }
     
     messageDiv.appendChild(bubbleDiv);
     chatLog.appendChild(messageDiv);

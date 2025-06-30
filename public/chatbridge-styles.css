@@ -88,6 +88,7 @@ body {
     border-radius: 18px;
     word-wrap: break-word;
     line-height: 1.4;
+    white-space: pre-wrap; /* Preserve line breaks and whitespace */
 }
 
 .bubble.user {
@@ -109,12 +110,22 @@ body {
     color: #718096;
     font-style: italic;
     animation: pulse 1.5s infinite;
+    white-space: normal; /* Keep normal for typing indicator */
 }
 
 .bubble.error {
     background: #fed7d7;
     color: #c53030;
     border: 1px solid #feb2b2;
+}
+
+/* Enhanced formatting for multi-line content */
+.bubble br {
+    line-height: 1.6;
+}
+
+.bubble strong {
+    font-weight: 600;
 }
 
 .input-container {
