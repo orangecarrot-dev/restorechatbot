@@ -65,9 +65,13 @@ const RestoreChatbot = () => {
     setIsLoading(true);
     setShowQuickPrompts(false);
 
-    // Reset textarea height
+    // Reset textarea height and refocus
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
+      // Small delay to ensure the DOM updates first
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
     }
 
     // Add typing indicator
@@ -147,6 +151,10 @@ const RestoreChatbot = () => {
       }));
     } finally {
       setIsLoading(false);
+      // Ensure focus is maintained after loading completes
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
     }
   };
 
