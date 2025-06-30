@@ -204,10 +204,10 @@ const RestoreChatbot = () => {
           {!showQuickPrompts && (
             <button
               onClick={handleBackToMenu}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               title="Back to main menu"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-6 h-6" />
             </button>
           )}
           
