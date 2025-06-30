@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +12,13 @@
         README:
         1. Change the WEBHOOK_URL constant below to your n8n webhook endpoint
         2. In n8n, create a workflow with:
-           - Webhook trigger (POST method)
+           - Webhook trigger (GET/POST method)
            - Your processing logic
            - Respond to Webhook node with JSON format: { "message": "Your response here" }
-        3. The webhook should accept a JSON body with 'text' property containing the user's message
+        3. The webhook should accept both GET (text query param) and POST (JSON body with text property)
         
         Example n8n setup:
-        - Webhook Trigger (POST) → [Your Logic] → Respond to Webhook
+        - Webhook Trigger (GET/POST) → [Your Logic] → Respond to Webhook
         - Respond with: { "message": "{{ $json.processedResponse }}" }
         */
         
@@ -256,7 +257,7 @@
 
     <script>
         // 🔧 CONFIGURATION - Updated with your n8n webhook endpoint
-        const WEBHOOK_URL = 'https://n8n-orangecarrot-u49460.vm.elestio.app/webhook/6b449924-7728-4089-afb8-b0cd4a03dc41';
+        const WEBHOOK_URL = 'https://n8n-orangecarrot-u49460.vm.elestio.app/webhook/ffe6d5ca-015d-46b2-8645-9e24cbfd5def';
         
         // DOM elements
         const chatLog = document.getElementById('chatLog');
@@ -283,27 +284,47 @@
             const typingBubble = addMessageBubble('Thinking...', 'typing');
             
             try {
-                console.log('Sending POST request to:', WEBHOOK_URL);
-                console.log('Request body:', { text: message });
+                console.log('Sending request to:', WEBHOOK_URL);
+                console.log('Message:', message);
                 
                 // Create timeout promise
                 const timeoutPromise = new Promise((_, reject) =>
                     setTimeout(() => reject(new Error('Request timeout')), 15000)
                 );
                 
-                // Make the POST request with timeout
-                const response = await Promise.race([
-                    fetch(WEBHOOK_URL, {
-                        method: 'POST',
-                        mode: 'cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({ text: message })
-                    }),
-                    timeoutPromise
-                ]);
+                // Try POST first, then GET as fallback
+                let response;
+                try {
+                    // Try POST request first
+                    console.log('Trying POST request with JSON body:', { text: message });
+                    response = await Promise.race([
+                        fetch(WEBHOOK_URL, {
+                            method: 'POST',
+                            mode: 'cors',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ text: message })
+                        }),
+                        timeoutPromise
+                    ]);
+                } catch (postError) {
+                    console.log('POST failed, trying GET request');
+                    // Fallback to GET request
+                    const getUrl = `${WEBHOOK_URL}?text=${encodeURIComponent(message)}`;
+                    console.log('Trying GET request to:', getUrl);
+                    response = await Promise.race([
+                        fetch(getUrl, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'application/json',
+                            }
+                        }),
+                        timeoutPromise
+                    ]);
+                }
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -379,7 +400,7 @@
         });
         
         console.log('ChatBridge initialized. Webhook URL:', WEBHOOK_URL);
-        console.log('To change the webhook URL, edit the WEBHOOK_URL constant in the script.');
+        console.log('Supports both GET and POST methods');
     </script>
 </body>
 </html>
