@@ -176,7 +176,21 @@ const RestoreChatbot = () => {
       <div className="w-full max-w-md h-[90vh] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grid\" width=\"10\" height=\"10\" patternUnits=\"userSpaceOnUse\"><path d=\"M 10 0 L 0 0 0 10\" fill=\"none\" stroke=\"rgba(255,255,255,0.05)\" stroke-width=\"1\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grid)\"/></svg>')] opacity-30"></div>
+          <div 
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                  <defs>
+                    <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    </pattern>
+                  </defs>
+                  <rect width="100" height="100" fill="url(#grid)"/>
+                </svg>
+              `)}")`
+            }}
+          ></div>
           <h1 className="text-2xl font-semibold mb-2 relative z-10">Restore AI Assistant</h1>
           <p className="text-sm opacity-90 mb-3 relative z-10">Advanced Foot Care Support</p>
           <div className="flex items-center justify-center gap-2 relative z-10">
