@@ -21,16 +21,10 @@ const quickPrompts = [
 ];
 
 const RestoreChatbot = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Welcome to Restore Podiatry! I'm here to help you learn about our advanced, non-invasive laser treatments for foot and ankle conditions. Ask me about our services, schedule an appointment, or get information about your foot health.",
-      type: 'assistant',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuickPrompts, setShowQuickPrompts] = useState(true);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -70,6 +64,7 @@ const RestoreChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+    setShowQuickPrompts(false);
 
     // Reset textarea height
     if (textareaRef.current) {
@@ -177,90 +172,103 @@ const RestoreChatbot = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
-      <div className="container mx-auto max-w-4xl h-screen flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center p-4">
+      <div className="w-full max-w-md h-[90vh] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-800/90 to-blue-800/90 backdrop-blur-md border-b border-white/10 p-6 shadow-xl">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-white mb-2">Restore AI Assistant</h1>
-            <p className="text-blue-200 text-lg mb-1">Advanced Foot Care Support</p>
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm text-green-300">Connected to Dr. Bhela's Practice</span>
-            </div>
+        <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grid\" width=\"10\" height=\"10\" patternUnits=\"userSpaceOnUse\"><path d=\"M 10 0 L 0 0 0 10\" fill=\"none\" stroke=\"rgba(255,255,255,0.05)\" stroke-width=\"1\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grid)\"/></svg>')] opacity-30"></div>
+          <h1 className="text-2xl font-semibold mb-2 relative z-10">Restore AI Assistant</h1>
+          <p className="text-sm opacity-90 mb-3 relative z-10">Advanced Foot Care Support</p>
+          <div className="flex items-center justify-center gap-2 relative z-10">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs">Connected to Dr. Bhela's Practice</span>
           </div>
         </div>
 
-        {/* Quick Prompts */}
-        <div className="p-4 bg-white/5 backdrop-blur-sm border-b border-white/10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {quickPrompts.map((prompt, index) => (
-              <button
-                key={index}
-                onClick={() => handleQuickPrompt(prompt)}
-                disabled={isLoading}
-                className="text-left p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg border border-white/20 text-white text-sm transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Messages and Initial Content */}
+        <div className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
+          {showQuickPrompts && (
+            <div className="p-5">
+              {/* Welcome Message */}
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-5 rounded-2xl mb-5 relative overflow-hidden shadow-lg">
+                <div className="absolute top-4 right-4 text-2xl opacity-70">🦶</div>
+                <h3 className="text-lg font-semibold mb-2">Welcome to Restore Podiatry!</h3>
+                <p className="text-sm leading-relaxed opacity-95">
+                  I'm here to help you learn about our advanced, non-invasive laser treatments for foot and ankle conditions. Ask me about our services, schedule an appointment, or get information about your foot health.
+                </p>
+              </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[80%] p-4 rounded-2xl backdrop-blur-md shadow-lg ${
-                  message.type === 'user'
-                    ? 'bg-blue-600/90 text-white ml-4'
-                    : message.type === 'assistant'
-                    ? 'bg-white/90 text-slate-800 mr-4 border border-white/20'
-                    : message.type === 'typing'
-                    ? 'bg-slate-700/90 text-slate-300 mr-4 animate-pulse'
-                    : 'bg-red-500/90 text-white mr-4'
-                }`}
-              >
-                <div className="whitespace-pre-wrap leading-relaxed">
-                  {formatMessageText(message.text)}
+              {/* Quick Prompts */}
+              <div>
+                <h4 className="text-slate-700 font-semibold mb-4">How can I help you today?</h4>
+                <div className="space-y-2">
+                  {quickPrompts.map((prompt, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleQuickPrompt(prompt)}
+                      disabled={isLoading}
+                      className="w-full text-left p-3 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-blue-500 hover:to-blue-600 hover:text-white rounded-xl transition-all duration-300 text-sm font-medium text-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Chat Messages */}
+          {messages.length > 0 && (
+            <div className="p-5 space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+                      message.type === 'user'
+                        ? 'bg-blue-500 text-white'
+                        : message.type === 'assistant'
+                        ? 'bg-white text-slate-800 border border-gray-200'
+                        : message.type === 'typing'
+                        ? 'bg-gray-200 text-slate-600 animate-pulse'
+                        : 'bg-red-500 text-white'
+                    }`}
+                  >
+                    <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {formatMessageText(message.text)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}
-        <div className="p-4 bg-white/5 backdrop-blur-md border-t border-white/10">
-          <div className="flex gap-3 items-end">
-            <div className="flex-1 relative">
-              <textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  adjustTextareaHeight();
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about treatments, schedule appointments, or get foot care advice..."
-                disabled={isLoading}
-                className="w-full p-4 bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 outline-none resize-none min-h-[56px] max-h-[120px] text-slate-800 placeholder-slate-500 disabled:opacity-50"
-                rows={1}
-              />
-              <div className="absolute bottom-2 right-2 text-xs text-slate-500">
-                Enter to send • Shift+Enter for new line
-              </div>
-            </div>
+        <div className="p-5 bg-white border-t border-gray-100">
+          <div className="flex gap-3 items-end bg-gray-50 rounded-2xl p-2 border-2 border-gray-200 focus-within:border-blue-400 focus-within:shadow-sm transition-all">
+            <textarea
+              ref={textareaRef}
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                adjustTextareaHeight();
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about foot pain, treatments, appointments..."
+              disabled={isLoading}
+              className="flex-1 bg-transparent border-none outline-none p-3 text-sm resize-none min-h-[20px] max-h-[120px] leading-relaxed disabled:opacity-50"
+              rows={1}
+            />
             <button
               onClick={() => sendMessage(inputValue)}
               disabled={!inputValue.trim() || isLoading}
-              className="p-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center min-w-[56px]"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center min-w-[44px]"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             </button>
           </div>
         </div>
