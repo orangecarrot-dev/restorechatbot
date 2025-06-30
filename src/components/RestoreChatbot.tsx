@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { Send, ArrowLeft } from 'lucide-react';
 
 const WEBHOOK_URL = 'https://n8n-orangecarrot-u49460.vm.elestio.app/webhook/ffe6d5ca-015d-46b2-8645-9e24cbfd5def';
 
@@ -151,6 +150,15 @@ const RestoreChatbot = () => {
     }
   };
 
+  const handleBackToMenu = () => {
+    setMessages([]);
+    setShowQuickPrompts(true);
+    setInputValue('');
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -191,6 +199,18 @@ const RestoreChatbot = () => {
               `)}")`
             }}
           ></div>
+          
+          {/* Back Button */}
+          {!showQuickPrompts && (
+            <button
+              onClick={handleBackToMenu}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10"
+              title="Back to main menu"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
+          
           <h1 className="text-2xl font-semibold mb-2 relative z-10">Restore AI Assistant</h1>
           <p className="text-sm opacity-90 mb-3 relative z-10">Advanced Foot Care Support</p>
           <div className="flex items-center justify-center gap-2 relative z-10">
