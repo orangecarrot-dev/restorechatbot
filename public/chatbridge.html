@@ -1,0 +1,384 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBridge</title>
+    <style>
+        /*
+        ChatBridge - n8n Workflow Chat Interface
+        
+        README:
+        1. Change the WEBHOOK_URL constant below to your n8n webhook endpoint
+        2. In n8n, create a workflow with:
+           - Webhook trigger (GET method)
+           - Your processing logic
+           - Respond to Webhook node with JSON format: { "reply": "Your response here" }
+        3. The webhook should accept a 'text' query parameter with the user's message
+        
+        Example n8n setup:
+        - Webhook Trigger → [Your Logic] → Respond to Webhook
+        - Respond with: { "reply": "{{ $json.processedResponse }}" }
+        */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        #chatLog {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .bubble.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .bubble.assistant {
+            background: white;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .bubble.typing {
+            background: #e2e8f0;
+            color: #718096;
+            font-style: italic;
+            animation: pulse 1.5s infinite;
+        }
+
+        .bubble.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+        }
+
+        #sendButton {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            min-width: 80px;
+        }
+
+        #sendButton:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #sendButton:active {
+            transform: translateY(0);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 640px) {
+            .container {
+                height: 100vh;
+                max-width: 100%;
+            }
+            
+            .bubble {
+                max-width: 85%;
+            }
+            
+            .input-container {
+                padding: 15px;
+            }
+            
+            #userInput {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        /* Scrollbar styling */
+        #chatLog::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatLog::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        #chatLog::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        #chatLog::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ChatBridge</h1>
+            <p>Connected to n8n workflow</p>
+        </div>
+        
+        <div id="chatLog">
+            <div class="message assistant">
+                <div class="bubble assistant">
+                    👋 Hello! I'm connected to your n8n workflow. Send me a message to get started!
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type a message…" autocomplete="off">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // 🔧 CONFIGURATION - Change this URL to your n8n webhook endpoint
+        const WEBHOOK_URL = 'https://YOUR-N8N-DOMAIN.hooks/webhook/chat';
+        
+        // DOM elements
+        const chatLog = document.getElementById('chatLog');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        // Focus input on load
+        userInput.focus();
+        
+        // Send message function
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Clear input and disable send button
+            userInput.value = '';
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+            
+            // Add user message bubble
+            addMessageBubble(message, 'user');
+            
+            // Add typing indicator
+            const typingBubble = addMessageBubble('Thinking...', 'typing');
+            
+            try {
+                // Build GET request URL with query parameter
+                const requestUrl = `${WEBHOOK_URL}?text=${encodeURIComponent(message)}`;
+                
+                console.log('Sending request to:', requestUrl);
+                
+                // Create timeout promise
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timeout')), 15000)
+                );
+                
+                // Make the request with timeout
+                const response = await Promise.race([
+                    fetch(requestUrl, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    }),
+                    timeoutPromise
+                ]);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received response:', data);
+                
+                // Remove typing indicator
+                typingBubble.remove();
+                
+                // Add assistant response
+                const reply = data.reply || 'No response received';
+                addMessageBubble(reply, 'assistant');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Remove typing indicator
+                typingBubble.remove();
+                
+                // Add error message
+                let errorMessage = 'Sorry, something went wrong.';
+                if (error.message.includes('timeout')) {
+                    errorMessage = 'Request timed out. Please try again.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Unable to connect. Please check your webhook URL.';
+                }
+                
+                addMessageBubble(errorMessage, 'error');
+            } finally {
+                // Re-enable send button
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+                userInput.focus();
+            }
+        }
+        
+        // Add message bubble to chat
+        function addMessageBubble(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = `bubble ${type}`;
+            bubbleDiv.textContent = text;
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatLog.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatLog.scrollTop = chatLog.scrollHeight;
+            
+            return messageDiv;
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !sendButton.disabled) {
+                sendMessage();
+            }
+        });
+        
+        // Prevent form submission if wrapped in a form
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+        
+        console.log('ChatBridge initialized. Webhook URL:', WEBHOOK_URL);
+        console.log('To change the webhook URL, edit the WEBHOOK_URL constant in the script.');
+    </script>
+</body>
+</html>
