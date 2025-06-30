@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, ArrowLeft } from 'lucide-react';
 
@@ -25,9 +24,11 @@ const RestoreChatbot = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showQuickPrompts, setShowQuickPrompts] = useState(true);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +41,37 @@ const RestoreChatbot = () => {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
+    }
+  }, []);
+
+  // Handle mobile keyboard detection and viewport changes
+  useEffect(() => {
+    const handleResize = () => {
+      const vh = window.visualViewport?.height || window.innerHeight;
+      const screenHeight = window.screen.height;
+      const keyboardHeight = screenHeight - vh;
+      
+      // Detect if keyboard is open (significant height difference)
+      const keyboardOpen = keyboardHeight > 150;
+      setIsKeyboardOpen(keyboardOpen);
+      
+      if (keyboardOpen && inputContainerRef.current) {
+        // Scroll input into view when keyboard opens
+        setTimeout(() => {
+          inputContainerRef.current?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+          });
+        }, 100);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      return () => window.visualViewport.removeEventListener('resize', handleResize);
+    } else {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
     }
   }, []);
 
@@ -66,13 +98,11 @@ const RestoreChatbot = () => {
     setIsLoading(true);
     setShowQuickPrompts(false);
 
-    // Reset textarea height and refocus
+    // Reset textarea height and maintain focus
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      // Small delay to ensure the DOM updates first
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 100);
+      // Keep focus on mobile to prevent keyboard from closing
+      textareaRef.current.focus();
     }
 
     // Add typing indicator
@@ -152,10 +182,10 @@ const RestoreChatbot = () => {
       }));
     } finally {
       setIsLoading(false);
-      // Ensure focus is maintained after loading completes
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 100);
+      // Maintain focus after response
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
     }
   };
 
@@ -189,10 +219,20 @@ const RestoreChatbot = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center p-2 sm:p-4">
-      <div className="w-full max-w-md h-screen sm:h-[90vh] bg-white/95 backdrop-blur-xl rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center">
+      <div 
+        className={`w-full max-w-md bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden
+          ${isKeyboardOpen 
+            ? 'h-screen rounded-none' 
+            : 'h-screen sm:h-[90vh] rounded-none sm:rounded-3xl'
+          }`}
+        style={{
+          // Use dynamic viewport height on mobile to account for keyboard
+          height: isKeyboardOpen ? '100vh' : undefined
+        }}
+      >
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-4 sm:p-6 text-center relative overflow-hidden">
+        <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-4 sm:p-6 text-center relative overflow-hidden flex-shrink-0">
           <div 
             className="absolute inset-0 opacity-30"
             style={{
@@ -213,7 +253,7 @@ const RestoreChatbot = () => {
           {!showQuickPrompts && (
             <button
               onClick={handleBackToMenu}
-              className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 p-3 sm:p-3 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10 min-w-[48px] min-h-[48px] flex items-center justify-center"
+              className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 p-4 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10 min-w-[56px] min-h-[56px] flex items-center justify-center"
               title="Back to main menu"
             >
               <ArrowLeft className="w-6 h-6" />
@@ -229,7 +269,10 @@ const RestoreChatbot = () => {
         </div>
 
         {/* Messages and Initial Content */}
-        <div className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
+        <div 
+          className={`flex-1 overflow-y-auto bg-gradient-to-b from-gray-50 to-white
+            ${isKeyboardOpen ? 'pb-2' : 'pb-4'}`}
+        >
           {showQuickPrompts && (
             <div className="p-3 sm:p-5">
               {/* Welcome Message */}
@@ -291,7 +334,11 @@ const RestoreChatbot = () => {
         </div>
 
         {/* Input */}
-        <div className="p-3 sm:p-5 bg-white border-t border-gray-100">
+        <div 
+          ref={inputContainerRef}
+          className={`bg-white border-t border-gray-100 flex-shrink-0 safe-area-inset-bottom
+            ${isKeyboardOpen ? 'p-2' : 'p-3 sm:p-5'}`}
+        >
           <div className="flex gap-2 sm:gap-3 items-end bg-gray-50 rounded-2xl p-2 border-2 border-gray-200 focus-within:border-blue-400 focus-within:shadow-sm transition-all">
             <textarea
               ref={textareaRef}
@@ -301,6 +348,15 @@ const RestoreChatbot = () => {
                 adjustTextareaHeight();
               }}
               onKeyDown={handleKeyDown}
+              onFocus={() => {
+                // Scroll input into view on focus (mobile)
+                setTimeout(() => {
+                  inputContainerRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                  });
+                }, 300);
+              }}
               placeholder="Ask about foot pain, treatments, appointments..."
               disabled={isLoading}
               className="flex-1 bg-transparent border-none outline-none p-2 sm:p-3 text-sm resize-none min-h-[20px] max-h-[100px] sm:max-h-[120px] leading-relaxed disabled:opacity-50"
@@ -309,7 +365,7 @@ const RestoreChatbot = () => {
             <button
               onClick={() => sendMessage(inputValue)}
               disabled={!inputValue.trim() || isLoading}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-2 sm:p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center min-w-[40px] sm:min-w-[44px]"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-2 sm:p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center min-w-[40px] sm:min-w-[44px] flex-shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>
