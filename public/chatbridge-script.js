@@ -129,16 +129,13 @@ function addMessageBubble(text, type) {
 // Event listeners
 sendButton.addEventListener('click', sendMessage);
 
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !sendButton.disabled) {
-        sendMessage();
-    }
-});
-
-// Prevent form submission if wrapped in a form
+// Fixed Enter key handling - single event listener
 userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-        e.preventDefault();
+        e.preventDefault(); // Prevent any default behavior
+        if (!sendButton.disabled) {
+            sendMessage();
+        }
     }
 });
 
