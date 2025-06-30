@@ -129,10 +129,11 @@ function addMessageBubble(text, type) {
 // Event listeners
 sendButton.addEventListener('click', sendMessage);
 
-// Fixed Enter key handling - single event listener
-userInput.addEventListener('keydown', (e) => {
+// Enter key handling with proper event prevention
+userInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         e.preventDefault(); // Prevent any default behavior
+        e.stopPropagation(); // Stop event bubbling
         if (!sendButton.disabled) {
             sendMessage();
         }
