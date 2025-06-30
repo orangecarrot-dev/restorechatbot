@@ -1,0 +1,227 @@
+
+/*
+ChatBridge - n8n Workflow Chat Interface
+
+README:
+1. Change the WEBHOOK_URL constant in chatbridge-script.js to your n8n webhook endpoint
+2. In n8n, create a workflow with:
+   - Webhook trigger (GET/POST method)
+   - Your processing logic
+   - Respond to Webhook node with JSON format: { "message": "Your response here" }
+3. The webhook should accept both GET (text query param) and POST (JSON body with text property)
+
+Example n8n setup:
+- Webhook Trigger (GET/POST) → [Your Logic] → Respond to Webhook
+- Respond with: { "message": "{{ $json.processedResponse }}" }
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.header p {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+#chatLog {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.assistant {
+    justify-content: flex-start;
+}
+
+.bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.bubble.user {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+.bubble.assistant {
+    background: white;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.bubble.typing {
+    background: #e2e8f0;
+    color: #718096;
+    font-style: italic;
+    animation: pulse 1.5s infinite;
+}
+
+.bubble.error {
+    background: #fed7d7;
+    color: #c53030;
+    border: 1px solid #feb2b2;
+}
+
+.input-container {
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+#userInput {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+#userInput:focus {
+    border-color: #667eea;
+}
+
+#sendButton {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    min-width: 80px;
+}
+
+#sendButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#sendButton:active {
+    transform: translateY(0);
+}
+
+#sendButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .container {
+        height: 100vh;
+        max-width: 100%;
+    }
+    
+    .bubble {
+        max-width: 85%;
+    }
+    
+    .input-container {
+        padding: 15px;
+    }
+    
+    #userInput {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+/* Scrollbar styling */
+#chatLog::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chatLog::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+#chatLog::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+#chatLog::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
