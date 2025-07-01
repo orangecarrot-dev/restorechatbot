@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Phone } from 'lucide-react';
 
 const WEBHOOK_URL = 'https://n8n-orangecarrot-u49460.vm.elestio.app/webhook/ffe6d5ca-015d-46b2-8645-9e24cbfd5def';
 
@@ -214,6 +214,10 @@ const RestoreChatbot = () => {
     sendMessage(prompt);
   };
 
+  const handlePhoneClick = () => {
+    window.open('tel:+1234567890', '_self');
+  };
+
   const formatMessageText = (text: string) => {
     return text.split('\n').map((line, index) => (
       <React.Fragment key={index}>
@@ -260,6 +264,15 @@ const RestoreChatbot = () => {
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           )}
+
+          {/* Phone Button */}
+          <button
+            onClick={handlePhoneClick}
+            className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 p-2 sm:p-3 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10 min-w-[40px] min-h-[40px] sm:min-w-[48px] sm:min-h-[48px] flex items-center justify-center"
+            title="Call us"
+          >
+            <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
           
           <h1 className="text-base sm:text-xl font-semibold mb-1 relative z-10 px-12 sm:px-0">Restore AI Assistant</h1>
           <p className="text-xs opacity-90 mb-1 sm:mb-2 relative z-10">Advanced Foot Care Support</p>
