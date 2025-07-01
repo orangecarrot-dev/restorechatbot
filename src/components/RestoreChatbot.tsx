@@ -232,8 +232,8 @@ const RestoreChatbot = () => {
           maxHeight: isKeyboardOpen ? '100vh' : '100vh'
         }}
       >
-        {/* Header - Fixed height */}
-        <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-3 sm:p-4 text-center relative overflow-hidden flex-shrink-0">
+        {/* Header - Fixed height with better mobile padding */}
+        <div className="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-2 sm:p-4 text-center relative overflow-hidden flex-shrink-0">
           <div 
             className="absolute inset-0 opacity-30"
             style={{
@@ -254,15 +254,15 @@ const RestoreChatbot = () => {
           {!showQuickPrompts && (
             <button
               onClick={handleBackToMenu}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10 min-w-[48px] min-h-[48px] flex items-center justify-center"
+              className="absolute left-1 sm:left-2 top-1/2 transform -translate-y-1/2 p-2 sm:p-3 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 z-10 min-w-[40px] min-h-[40px] sm:min-w-[48px] sm:min-h-[48px] flex items-center justify-center"
               title="Back to main menu"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           )}
           
-          <h1 className="text-lg sm:text-xl font-semibold mb-1 relative z-10">Restore AI Assistant</h1>
-          <p className="text-xs opacity-90 mb-2 relative z-10">Advanced Foot Care Support</p>
+          <h1 className="text-base sm:text-xl font-semibold mb-1 relative z-10 px-12 sm:px-0">Restore AI Assistant</h1>
+          <p className="text-xs opacity-90 mb-1 sm:mb-2 relative z-10">Advanced Foot Care Support</p>
           <div className="flex items-center justify-center gap-2 relative z-10">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-xs">Connected to Dr. Bhela's Practice</span>
@@ -275,32 +275,32 @@ const RestoreChatbot = () => {
           className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-50 to-white"
           style={{
             minHeight: 0,
-            paddingBottom: isKeyboardOpen ? '8px' : '16px'
+            paddingBottom: isKeyboardOpen ? '4px' : '8px'
           }}
         >
           {showQuickPrompts && (
-            <div className="p-4 space-y-4">
+            <div className="p-2 sm:p-4 space-y-3 sm:space-y-4">
               {/* Welcome Message */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-2xl relative overflow-hidden shadow-lg">
-                <div className="absolute top-3 right-3 text-xl opacity-70">🦶</div>
-                <h3 className="text-base font-semibold mb-2 pr-8">Welcome to Restore Podiatry!</h3>
-                <p className="text-sm leading-relaxed opacity-95">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 sm:p-4 rounded-2xl relative overflow-hidden shadow-lg">
+                <div className="absolute top-2 sm:top-3 right-2 sm:right-3 text-lg sm:text-xl opacity-70">🦶</div>
+                <h3 className="text-sm sm:text-base font-semibold mb-2 pr-6 sm:pr-8 leading-tight">Welcome to Restore Podiatry!</h3>
+                <p className="text-xs sm:text-sm leading-relaxed opacity-95 pr-2">
                   I'm here to help you learn about our advanced, non-invasive laser treatments for foot and ankle conditions. Ask me about our services, schedule an appointment, or get information about your foot health.
                 </p>
               </div>
 
               {/* Quick Prompts */}
               <div>
-                <h4 className="text-slate-700 font-semibold mb-3 text-sm">How can I help you today?</h4>
+                <h4 className="text-slate-700 font-semibold mb-2 sm:mb-3 text-xs sm:text-sm px-1">How can I help you today?</h4>
                 <div className="space-y-2">
                   {quickPrompts.map((prompt, index) => (
                     <button
                       key={index}
                       onClick={() => handleQuickPrompt(prompt)}
                       disabled={isLoading}
-                      className="w-full text-left p-3 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-blue-500 hover:to-blue-600 hover:text-white rounded-xl transition-all duration-300 text-sm font-medium text-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full text-left p-2.5 sm:p-3 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-blue-500 hover:to-blue-600 hover:text-white rounded-xl transition-all duration-300 text-xs sm:text-sm font-medium text-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed leading-tight"
                     >
-                      {prompt}
+                      <span className="block break-words">{prompt}</span>
                     </button>
                   ))}
                 </div>
@@ -310,14 +310,14 @@ const RestoreChatbot = () => {
 
           {/* Chat Messages */}
           {messages.length > 0 && (
-            <div className="p-4 space-y-4">
+            <div className="p-2 sm:p-4 space-y-3 sm:space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] p-3 rounded-2xl shadow-sm ${
+                    className={`max-w-[90%] sm:max-w-[85%] p-2.5 sm:p-3 rounded-2xl shadow-sm ${
                       message.type === 'user'
                         ? 'bg-blue-500 text-white'
                         : message.type === 'assistant'
@@ -327,7 +327,7 @@ const RestoreChatbot = () => {
                         : 'bg-red-500 text-white'
                     }`}
                   >
-                    <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                    <div className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">
                       {formatMessageText(message.text)}
                     </div>
                   </div>
@@ -338,15 +338,15 @@ const RestoreChatbot = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input - Fixed at bottom */}
+        {/* Input - Fixed at bottom with improved mobile sizing */}
         <div 
           ref={inputContainerRef}
-          className="bg-white border-t border-gray-100 flex-shrink-0 p-3"
+          className="bg-white border-t border-gray-100 flex-shrink-0 p-2 sm:p-3"
           style={{
-            paddingBottom: isKeyboardOpen ? '8px' : '16px'
+            paddingBottom: isKeyboardOpen ? '4px' : '8px'
           }}
         >
-          <div className="flex gap-2 items-end bg-gray-50 rounded-2xl p-2 border-2 border-gray-200 focus-within:border-blue-400 focus-within:shadow-sm transition-all">
+          <div className="flex gap-1.5 sm:gap-2 items-end bg-gray-50 rounded-2xl p-1.5 sm:p-2 border-2 border-gray-200 focus-within:border-blue-400 focus-within:shadow-sm transition-all">
             <textarea
               ref={textareaRef}
               value={inputValue}
@@ -366,15 +366,15 @@ const RestoreChatbot = () => {
               }}
               placeholder="Ask about foot pain, treatments, appointments..."
               disabled={isLoading}
-              className="flex-1 bg-transparent border-none outline-none p-2 text-sm resize-none min-h-[20px] max-h-[100px] leading-relaxed disabled:opacity-50"
+              className="flex-1 bg-transparent border-none outline-none p-1.5 sm:p-2 text-xs sm:text-sm resize-none min-h-[20px] max-h-[100px] leading-relaxed disabled:opacity-50"
               rows={1}
             />
             <button
               onClick={() => sendMessage(inputValue)}
               disabled={!inputValue.trim() || isLoading}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center min-w-[40px] flex-shrink-0"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-1.5 sm:p-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center min-w-[32px] sm:min-w-[40px] flex-shrink-0"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>
