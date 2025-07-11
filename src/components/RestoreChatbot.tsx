@@ -215,7 +215,7 @@ const RestoreChatbot = () => {
   };
 
   const handlePhoneClick = () => {
-    window.open('tel:+15169735417', '_self');
+    window.open('tel:+15619029938', '_self');
   };
 
   const formatMessageText = (text: string) => {
