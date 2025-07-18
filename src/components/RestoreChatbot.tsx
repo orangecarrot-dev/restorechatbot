@@ -10,14 +10,6 @@ interface Message {
   timestamp: Date;
 }
 
-const quickPrompts = [
-  "🎯 Plantar Fasciitis Treatment Options",
-  "🦶 Toenail Fungus Laser Therapy",
-  "📅 Schedule an Appointment", 
-  "📍 Locations & Hours",
-  "⚡ Non-Invasive Treatments",
-  "💳 Insurance & Pricing"
-];
 
 const RestoreChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -210,9 +202,6 @@ const RestoreChatbot = () => {
     }
   };
 
-  const handleQuickPrompt = (prompt: string) => {
-    sendMessage(prompt);
-  };
 
   const handlePhoneClick = () => {
     window.open('tel:+15619029938', '_self');
@@ -302,22 +291,6 @@ const RestoreChatbot = () => {
                 </p>
               </div>
 
-              {/* Quick Prompts */}
-              <div>
-                <h4 className="text-slate-700 font-semibold mb-2 sm:mb-3 text-xs sm:text-sm px-1">How can I help you today?</h4>
-                <div className="space-y-2">
-                  {quickPrompts.map((prompt, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickPrompt(prompt)}
-                      disabled={isLoading}
-                      className="w-full text-left p-2.5 sm:p-3 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-blue-500 hover:to-blue-600 hover:text-white rounded-xl transition-all duration-300 text-xs sm:text-sm font-medium text-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed leading-tight"
-                    >
-                      <span className="block break-words">{prompt}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
 
