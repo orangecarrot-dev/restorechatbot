@@ -287,7 +287,7 @@ const RestoreChatbot = () => {
                 <div className="absolute top-2 sm:top-3 right-2 sm:right-3 text-lg sm:text-xl opacity-70">🦶</div>
                 <h3 className="text-sm sm:text-base font-semibold mb-2 pr-6 sm:pr-8 leading-tight">Welcome to Restore Podiatry!</h3>
                 <p className="text-xs sm:text-sm leading-relaxed opacity-95 pr-2">
-                  I'm here to help you learn about our advanced, non-invasive laser treatments for foot and ankle conditions. Ask me about our services, schedule an appointment, or get information about your foot health.
+                  I'm here to help you learn about our advanced, non-invasive laser treatments and foot care services. I can provide general information about our procedures, practice hours, location, and help you schedule an appointment.
                 </p>
               </div>
 
