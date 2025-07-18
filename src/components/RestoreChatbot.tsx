@@ -217,12 +217,13 @@ const RestoreChatbot = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center p-0">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center p-0" style={{ height: '100dvh', minHeight: '100vh' }}>
       <div 
-        className="w-full max-w-md bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden h-full rounded-none sm:h-[90vh] sm:rounded-3xl"
+        className="w-full max-w-md bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden rounded-none sm:rounded-3xl"
         style={{
-          height: isKeyboardOpen ? '100vh' : '100vh',
-          maxHeight: isKeyboardOpen ? '100vh' : '100vh'
+          height: '100dvh',
+          minHeight: '100vh',
+          maxHeight: '100dvh'
         }}
       >
         {/* Header - Fixed height with better mobile padding */}
